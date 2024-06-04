@@ -12,7 +12,7 @@ module.exports = {
       userType: { // 0 employee, 1 recruiter, 2 company
         type: Sequelize.ENUM('0', '1', '2')
       },
-      firstname: {
+      firstName: {
         type: Sequelize.STRING
       },
       lastName: {

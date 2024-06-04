@@ -1,8 +1,11 @@
-const {Sequelize} = require('sequelize');
+const { Sequelize } = require('sequelize');
 
-const env = process.env.NODE_ENV || 'development';
-const config = require('./config')[env]
+const sequelize = new Sequelize('WageSecure', 'postgres', 'postgres', {
+  host: 'localhost',
+  dialect: 'postgres', // or 'postgres', 'sqlite', 'mariadb', 'mssql'
+});
 
-const sequelize = new Sequelize(config);
-
-module.exports = sequelize
+module.exports = {
+  sequelize,
+  Sequelize
+};
