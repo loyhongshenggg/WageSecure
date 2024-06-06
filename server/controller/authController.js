@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const xrpl = require("xrpl")
+const { createUserWallet } = require('../utils/wallet')
 
 const generateToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_SECRET, {
@@ -14,33 +16,37 @@ const generateToken = (payload) => {
 const signup = catchAsync(async (req, res, next) => {
     const body = req.body;
 
+    // creates a cold wallet address
+    const walletSeed = (await createUserWallet()).seed;
     
-        const newUser = await user.create({
-            userType: body.userType,
-            firstName: body.firstName,
-            lastName: body.lastName,
-            email: body.email,
-            password: body.password,
-            confirmPassword: body.confirmPassword
-        });
+    const newUser = await user.create({
+        userType: body.userType,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        email: body.email,
+        password: body.password,
+        confirmPassword: body.confirmPassword,
+        walletSeed: walletSeed
+    });
 
-        if (!newUser) {
-            return next(new AppError('Failed to create the user', 400));
-        }
+    if (!newUser) {
+        return next(new AppError('Failed to create the user', 400));
+    }
 
-        const result = newUser.toJSON();
+    const result = newUser.toJSON();
 
-        delete result.password;
-        delete result.deletedAt;
+    delete result.password;
+    delete result.deletedAt;
 
-        result.token = generateToken({
-            id: result.id
-        })
+    result.token = generateToken({
+        id: result.id
+    })
 
-        return res.status(201).json({
-            status: 'success',
-            data: result, // return JWT to user after registration
-        });
+
+    return res.status(201).json({
+        status: 'success',
+        data: result, // return JWT to user after registration
+    });
     
 });
 

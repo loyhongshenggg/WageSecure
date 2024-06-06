@@ -5,6 +5,7 @@ const catchAsync = require("./utils/catchAsync");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controller/errorController");
 const app = express();
+const {createAdminWallet} = require('./utils/wallet')
 
 app.use(express.json()); // converts data from req obj into json format
 
@@ -27,3 +28,16 @@ const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
+
+async function setUpAdminWallet() {
+  try {
+      const wallet = await createAdminWallet();
+      console.log("Wallets setup complete.");
+      // set(process.env.COLD_WALLET, wallets.coldWallet, { protected: true });
+      console.log("Wallet address:", wallet.address);
+  } catch (error) {
+      console.error("Error setting up wallets:", error);
+  }
+}
+
+setUpAdminWallet();

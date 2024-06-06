@@ -24,6 +24,9 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
+      walletSeed: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
