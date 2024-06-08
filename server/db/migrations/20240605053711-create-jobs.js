@@ -26,14 +26,24 @@ module.exports = {
       employerId: {
         type: Sequelize.STRING
       },
+      recruiterId: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
+      ratePerHour: {
+        type: Sequelize.FLOAT,
+      },
+      hoursPerDay: {
+        type: Sequelize.FLOAT,
+      },
+      recruiterCommission: {
+        type: Sequelize.FLOAT
+      },
       isJobCompleted: {
         type: Sequelize.BOOLEAN
       },
       deletedAt: {
         type: Sequelize.DATE
-      },
-      walletSeed: {
-        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

@@ -9,10 +9,10 @@ const globalErrorHandler = require("./controller/errorController");
 const app = express();
 const {createAdminWallet} = require('./utils/wallet')
 
-app.use(express.json()); // converts data from req obj into json format
-
 // Enable CORS for all requests
 app.use(cors());
+
+app.use(express.json()); // converts data from req obj into json format
 
 
 // all routes here

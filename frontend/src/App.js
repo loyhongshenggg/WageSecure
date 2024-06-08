@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ChakraProvider } from "@chakra-ui/react";
 import Signup from './pages/signup';
 import Login from './pages/login';
+import CompanyDashboard from './pages/companyDashboard';
+import CreateJobForm from './pages/createJobForm';
 
 function App() {
   return (
@@ -13,7 +15,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Signup />} />
-          <Route path="/CompanyDashboard" element={<TransactionViewer />} />
+          <Route path="/companyDashboard" element={<CompanyDashboard />} />
+          <Route path="/createJob" element={<CreateJobForm />} />
         </Routes>
       </Router>
     </ChakraProvider>
@@ -21,4 +24,3 @@ function App() {
 }
 
 export default App;
-

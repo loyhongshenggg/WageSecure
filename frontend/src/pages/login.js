@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, VStack, Heading } from '@chakra-ui/react';
-import { getAuth } from '../api/auth'; 
+import { getLoginAuth } from '../api/auth/loginAuth'; 
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -17,13 +17,17 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await getAuth('login', formData);
+    
+    getLoginAuth(formData)
+    .then((response) => {
       console.log(response);
-      navigate('/login');
-    } catch (error) {
-      console.error(error.response.data);
-    }
+      localStorage.setItem('id', response.id);
+      localStorage.setItem('token', response.token);
+      navigate('/companyDashboard');
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   };
 
   return (

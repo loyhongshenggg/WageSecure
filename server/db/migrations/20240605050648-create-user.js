@@ -26,15 +26,7 @@ module.exports = {
       },
       lastName: {
         type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          notNull: {
-            msg: 'lastName cannot be null',
-          },
-          notEmpty: {
-            msg: 'lastName cannot be empty',
-          },
-        },
+        allowNull: true,
       },
       email: {
         type: Sequelize.STRING,
@@ -63,6 +55,10 @@ module.exports = {
             msg: 'password cannot be empty',
           },
         },
+      },
+      walletSeed: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

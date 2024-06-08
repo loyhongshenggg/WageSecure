@@ -1,52 +1,86 @@
-import React, { useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, Checkbox, Button, Box } from '@chakra-ui/react';
+// src/components/CompanyDashboard.js
 
-const TransactionViewer = () => {
-  const [selectedTransactions, setSelectedTransactions] = useState([]);
-  const transactions = [
-    { id: 1, date: '2024-06-01', amount: '$100.00', description: 'Example transaction 1' },
-    { id: 2, date: '2024-06-02', amount: '$150.00', description: 'Example transaction 2' },
-    { id: 3, date: '2024-06-03', amount: '$75.00', description: 'Example transaction 3' }
-  ];
+import React, { useState, useEffect } from 'react';
+import { Table, Thead, Tbody, Tr, Th, Td, Checkbox, Button, Box, Flex, Spacer } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { getAllJobsOfCompany } from '../api/job/getAllJobs';
+import { markJobDone } from '../api/job/markJobDone';
 
-  const toggleCheckbox = (transactionId) => {
-    setSelectedTransactions(prevSelected => {
-      if (prevSelected.includes(transactionId)) {
-        return prevSelected.filter(id => id !== transactionId);
+const CompanyDashboard = () => {
+  const [jobs, setJobs] = useState([]);
+  const [selectedJobs, setSelectedJobs] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch jobs data from the API
+    getAllJobsOfCompany(localStorage.getItem('id'))
+      .then(response => {
+        setJobs(response.data.job); // Assuming the response contains job data in an array
+      })
+      .catch(error => {
+        console.error('Error fetching jobs:', error);
+      });
+  }, []); // Empty dependency array to fetch data only once when component mounts
+
+  const toggleCheckbox = (jobId) => {
+    setSelectedJobs(prevSelected => {
+      if (prevSelected.includes(jobId)) {
+        return prevSelected.filter(id => id !== jobId);
       } else {
-        return [...prevSelected, transactionId];
+        return [...prevSelected, jobId];
       }
     });
   };
 
+  const markJobAsComplete = async (jobId) => {
+    try {
+      await markJobDone(jobId);
+      // If successful, update the jobs data to reflect the completion
+      setJobs(prevJobs => prevJobs.map(job => job.id === jobId ? { ...job, isJobCompleted: true } : job));
+    } catch (error) {
+      console.error('Error completing job:', error.message);
+    }
+  };
+
   const handleSubmit = () => {
-    // Process selectedTransactions here, e.g., send to server
-    console.log(selectedTransactions);
+    // Process selectedJobs here, e.g., send to server
+    selectedJobs.forEach(jobId => {
+      markJobAsComplete(jobId);
+    });
   };
 
   return (
     <Box p={4}>
+      <Flex mb={4}>
+        <Spacer />
+        <Button colorScheme="teal" onClick={() => navigate('/createJob')}>Create Job</Button>
+      </Flex>
       <Table variant="striped" colorScheme="gray">
         <Thead>
           <Tr>
             <Th>Select</Th>
-            <Th>Date</Th>
-            <Th>Amount</Th>
-            <Th>Description</Th>
+            <Th>Job ID</Th>
+            <Th>Job Name</Th>
+            <Th>Number of Employees</Th>
+            <Th>Job Status</Th>
+            <Th>Recruiter</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {transactions.map(transaction => (
-            <Tr key={transaction.id}>
+          {jobs.map(job => (
+            <Tr key={job.id}>
               <Td>
                 <Checkbox
-                  isChecked={selectedTransactions.includes(transaction.id)}
-                  onChange={() => toggleCheckbox(transaction.id)}
+                  isChecked={selectedJobs.includes(job.id)}
+                  onChange={() => toggleCheckbox(job.id)}
+                  isDisabled={job.isJobCompleted} // Disable checkbox if job status is done
                 />
               </Td>
-              <Td>{transaction.date}</Td>
-              <Td>{transaction.amount}</Td>
-              <Td>{transaction.description}</Td>
+              <Td>{job.id}</Td>
+              <Td>{job.jobName}</Td>
+              <Td>{job.employeesId.length}</Td>
+              <Td>{job.isJobCompleted ? 'Done' : 'In progress'}</Td>
+              <Td>{job.recruiter ? 'Yes' : 'No'}</Td>
             </Tr>
           ))}
         </Tbody>
@@ -55,7 +89,7 @@ const TransactionViewer = () => {
         colorScheme="blue"
         mt={4}
         onClick={handleSubmit}
-        isDisabled={selectedTransactions.length === 0}
+        isDisabled={selectedJobs.length === 0}
       >
         Submit
       </Button>
@@ -63,4 +97,4 @@ const TransactionViewer = () => {
   );
 };
 
-export default TransactionViewer;
+export default CompanyDashboard;

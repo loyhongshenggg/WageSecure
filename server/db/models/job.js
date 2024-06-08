@@ -26,7 +26,7 @@ module.exports = sequelize.define('job', {
     jobEndDate: DataTypes.STRING,
     employeesId: DataTypes.ARRAY(DataTypes.STRING),
     employerId: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
           notNull: {
@@ -36,6 +36,22 @@ module.exports = sequelize.define('job', {
               msg: 'employerId cannot be empty',
           },
       },
+    },
+    recruiterId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    ratePerHour: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    hoursPerDay: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    recruiterCommission: {
+      type: DataTypes.FLOAT,
+      allowNull: false
     },
     deletedAt: DataTypes.DATE,
     isJobCompleted: DataTypes.BOOLEAN

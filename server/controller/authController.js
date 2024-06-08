@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const xrpl = require("xrpl")
 const { createUserWallet } = require('../utils/wallet')
 
 const generateToken = (payload) => {
@@ -17,8 +16,18 @@ const signup = catchAsync(async (req, res, next) => {
     const body = req.body;
 
     // creates a cold wallet address
-    const walletSeed = (await createUserWallet()).seed;
+    let walletSeed;
+    try {
+        walletSeed = (await createUserWallet()).seed;
+    } catch (error) {
+        return next(new AppError('Failed to create wallet', 500));
+    }
     
+    // ensure walletSeed was created successfully
+    if (!walletSeed) {
+        return next(new AppError('Failed to create wallet seed', 500));
+    }
+
     const newUser = await user.create({
         userType: body.userType,
         firstName: body.firstName,
@@ -40,43 +49,44 @@ const signup = catchAsync(async (req, res, next) => {
 
     result.token = generateToken({
         id: result.id
-    })
-
+    });
 
     return res.status(201).json({
         status: 'success',
         data: result, // return JWT to user after registration
     });
-    
 });
 
-const login = catchAsync( async (req, res, next) => {
-    const {email, password} = req.body;
+
+const login = catchAsync(async (req, res, next) => {
+    const { email, password } = req.body;
 
     if (!email || !password) {
-        return next(new AppError('Please provide email and password', 400))
+        return next(new AppError('Please provide email and password', 400));
     }
 
-    const result = await user.findOne({where: {email}});
-    if (!result) {
-        return next(new AppError("Incorrect Email or Password", 400))
+    const userRecord = await user.findOne({ where: { email } });
+    if (!userRecord) {
+        return next(new AppError("Incorrect Email or Password", 400));
     }
 
-    const isPasswordMatched = await bcrypt.compare(password, result.password);
+    const isPasswordMatched = await bcrypt.compare(password, userRecord.password);
     if (!isPasswordMatched) {
-        return next(new AppError("Incorrect Email or Password", 400))
+        return next(new AppError("Incorrect Email or Password", 400));
     }
 
     const token = generateToken({
-        id: result.id,
-    })
-    console.log(result.id);
+        id: userRecord.id,
+    });
+    console.log(userRecord.id);
 
     return res.json({
         status: "success",
-        token
-    })
-})
+        token,
+        id: userRecord.id,
+        
+    });
+});
 
 // we will run authentication on all internal routes
 const authentication = catchAsync(async (req, res, next) => {
