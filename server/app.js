@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express")
+const cors = require('cors');
 const authRouter = require("./routes/authRoute");
 const jobRouter = require("./routes/jobRoute")
 const catchAsync = require("./utils/catchAsync");
@@ -9,6 +10,9 @@ const app = express();
 const {createAdminWallet} = require('./utils/wallet')
 
 app.use(express.json()); // converts data from req obj into json format
+
+// Enable CORS for all requests
+app.use(cors());
 
 
 // all routes here
