@@ -4,6 +4,7 @@ const job  = require('../db/models/job');
 const user = require('../db/models/user');
 const { getWalletAddressFromSeed, sendXRP, getWalletBalance, sendXRPGroup } = require("../utils/wallet");
 const { daysBetweenDates } = require("../utils/date");
+const { createPdf, sendPdf } = require("../utils/email");
 
 
 // 1. Checks if employer has enough XRP to deploy job
@@ -97,7 +98,6 @@ const markJobAsComplete = catchAsync(async (req, res, next) => {
   // Calculate totalXRP
   const days = daysBetweenDates(existingJob.jobStartDate, existingJob.jobEndDate);
   const totalXRP = days * existingJob.hoursPerDay * existingJob.ratePerHour * existingJob.employeesId.length;
-
   try {
     if (recruiterToPay) {
       const recruiterWalletSeed = recruiterToPay.walletSeed; // Get the recruiter walletSeed
@@ -108,12 +108,22 @@ const markJobAsComplete = catchAsync(async (req, res, next) => {
       await sendXRP(adminWalletSeed, recruiterWalletSeed, recruiterCommissionEarned);
 
       // Execute sendXRP for each employee walletSeed in parallel (parallel does not work) synchronous
-      await sendXRPGroup(adminWalletSeed, walletSeedsArray, xrpPerWallet);
+      const consolidatedtx = await sendXRPGroup(adminWalletSeed, walletSeedsArray, xrpPerWallet);
+
+      // generate pdf
+      await createPdf(consolidatedtx, existingJob.employeesId);
+
+      await sendPdf(existingJob.employeesId);
     } else {
       const xrpPerWallet = parseFloat((totalXRP / existingJob.employeesId.length).toFixed(2));
 
       // Execute sendXRP for each employee walletSeed in parallel (parallel does not work)
-      await sendXRPGroup(adminWalletSeed, walletSeedsArray, xrpPerWallet);
+      const consolidatedtx = await sendXRPGroup(adminWalletSeed, walletSeedsArray, xrpPerWallet);
+
+      // generate pdf
+      await createPdf(consolidatedtx, existingJob.employeesId);
+
+      await sendPdf(existingJob.employeesId);
     }
   } catch (error) {
     return next(new AppError('Failed to transfer XRP', 500));
@@ -122,6 +132,9 @@ const markJobAsComplete = catchAsync(async (req, res, next) => {
   // Once transaction done, mark the job as completed
   existingJob.isJobCompleted = true;
   await existingJob.save();
+
+  
+  
 
   res.status(200).json({
     status: 'success',

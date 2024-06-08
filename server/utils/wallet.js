@@ -77,7 +77,7 @@ async function sendXRP(srcSeed, destSeed, xrpAmt) {
     console.log(tx);        
     client.disconnect()    
 
-    
+    return tx;
 }
 
 
@@ -91,6 +91,8 @@ async function sendXRPGroup(srcSeed, destSeedArr, xrpAmt) {
     console.log("\nConnected. Sending XRP.\n");
     
     const standby_wallet = xrpl.Wallet.fromSeed(srcSeed);
+
+    let consolidatedtx = [];
     
     for (let destSeed of destSeedArr) {
         const operational_wallet = xrpl.Wallet.fromSeed(destSeed);
@@ -112,10 +114,11 @@ async function sendXRPGroup(srcSeed, destSeedArr, xrpAmt) {
         let standby_wallet_amt = await client.getXrpBalance(standby_wallet.address);
         let operational_wallet_amt = await client.getXrpBalance(operational_wallet.address);
         console.log(`Sender has ${standby_wallet_amt}, receiver has ${operational_wallet_amt}`);
-        console.log(tx);
+        consolidatedtx.push(tx);
     }
     
     client.disconnect();
+    return consolidatedtx;
 }
 
 
