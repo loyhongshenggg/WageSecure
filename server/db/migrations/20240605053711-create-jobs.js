@@ -1,28 +1,36 @@
 'use strict';
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('user', {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('job', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      userType: { // 0 employee, 1 recruiter, 2 company
-        type: Sequelize.ENUM('0', '1', '2')
-      },
-      firstName: {
+      jobName: {
         type: Sequelize.STRING
       },
-      lastName: {
+      jobDescription: {
         type: Sequelize.STRING
       },
-      email: {
+      jobStartDate: {
         type: Sequelize.STRING
       },
-      password: {
+      jobEndDate: {
         type: Sequelize.STRING
+      },
+      employeesId: {
+        type: Sequelize.ARRAY(Sequelize.STRING)
+      },
+      employerId: {
+        type: Sequelize.STRING
+      },
+      isJobCompleted: {
+        type: Sequelize.BOOLEAN
+      },
+      deletedAt: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -31,13 +39,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      },
-      deletedAt: {
-        type: Sequelize.DATE
       }
     });
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('job');
   }
 };

@@ -64,6 +64,7 @@ const login = catchAsync( async (req, res, next) => {
     const token = generateToken({
         id: result.id,
     })
+    console.log(result.id);
 
     return res.json({
         status: "success",
@@ -71,4 +72,34 @@ const login = catchAsync( async (req, res, next) => {
     })
 })
 
-module.exports = { signup, login };
+// we will run authentication on all internal routes
+const authentication = catchAsync(async (req, res, next) => {
+    // 1. get the token from header
+    // 2. verify the token
+    // 3. return the user detail from db in request obj
+
+    let idToken = '';
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        // we split since what we get is Bearer sioehfioaw
+        idToken = req.headers.authorization.split(' ')[1];
+
+        if (!idToken) {
+            return next(new AppError('Please login to get access'));
+        }
+
+        const tokenDetail = jwt.verify(idToken, process.env.JWT_SECRET);
+
+        //if token invalid
+        const freshUser = user.findByPk(tokenDetail.id)
+
+        if (!freshUser) {
+            return next(new AppError('User no longer exists', 400));
+        }
+        req.user = await freshUser;
+        return next();
+    } else {
+        return next(new AppError('Please login to get access'));
+    }
+});
+
+module.exports = { signup, login, authentication };

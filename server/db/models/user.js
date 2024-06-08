@@ -7,9 +7,9 @@ const AppError = require('../../utils/appError');
 module.exports = sequelize.define('user', {
   id: {
     allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    type: DataTypes.INTEGER
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4
   },
   userType: { // 0 employee, 1 recruiter, 2 company
     type: DataTypes.ENUM('0', '1', '2')
@@ -41,6 +41,7 @@ lastName: {
 email: {
   type: DataTypes.STRING,
   allowNull: false,
+  unique: true,
   validate: {
       notNull: {
           msg: 'email cannot be null',

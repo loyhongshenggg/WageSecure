@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express")
 const authRouter = require("./routes/authRoute");
+const jobRouter = require("./routes/jobRoute")
 const catchAsync = require("./utils/catchAsync");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controller/errorController");
@@ -11,6 +12,7 @@ app.use(express.json()); // converts data from req obj into json format
 
 // all routes here
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/job', jobRouter);
 
 
 app.use('*', catchAsync(async (req, res, next) => { // to handle routes that do not appear
