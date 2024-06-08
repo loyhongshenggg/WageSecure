@@ -13,6 +13,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Signup />} />
+          <Route path="/CompanyDashboard" element={<TransactionViewer />} />
         </Routes>
       </Router>
     </ChakraProvider>
