@@ -15,7 +15,6 @@ const generateToken = (payload) => {
 const signup = catchAsync(async (req, res, next) => {
     const body = req.body;
 
-    // creates a cold wallet address
     let walletSeed;
     try {
         walletSeed = (await createUserWallet()).seed;
@@ -23,7 +22,6 @@ const signup = catchAsync(async (req, res, next) => {
         return next(new AppError('Failed to create wallet', 500));
     }
     
-    // ensure walletSeed was created successfully
     if (!walletSeed) {
         return next(new AppError('Failed to create wallet seed', 500));
     }

@@ -55,7 +55,6 @@ const createJob = catchAsync(async (req, res, next) => {
   }
   
 
-  // Send a response back to the client
   res.status(201).json({
     status: 'success',
     data: {
@@ -68,7 +67,6 @@ const createJob = catchAsync(async (req, res, next) => {
 const markJobAsComplete = catchAsync(async (req, res, next) => {
   const { jobId } = req.body; 
 
-  // Find the job by its ID
   const existingJob = await job.findByPk(jobId);
 
   if (!existingJob) {
@@ -105,10 +103,9 @@ const markJobAsComplete = catchAsync(async (req, res, next) => {
       const recruiterCommissionEarned = totalXRP * existingJob.recruiterCommission;
       const xrpPerWallet = parseFloat(((totalXRP - recruiterCommissionEarned) / existingJob.employeesId.length).toFixed(2));
 
-      // Execute sendXRP for recruiter
       await sendXRP(adminWalletSeed, recruiterWalletSeed, recruiterCommissionEarned);
 
-      // Execute sendXRP for each employee walletSeed in parallel (parallel does not work) synchronous
+      // Execute sendXRP for each employee walletSeed in parallel (parallel does not work) so I used synchronous
       const consolidatedtx = await sendXRPGroup(adminWalletSeed, walletSeedsArray, xrpPerWallet);
 
       // generate pdf

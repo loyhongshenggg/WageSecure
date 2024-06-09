@@ -9,19 +9,18 @@ const globalErrorHandler = require("./controller/errorController");
 const app = express();
 const {createAdminWallet} = require('./utils/wallet')
 
-// Enable CORS for all requests
 app.use(cors());
 
-app.use(express.json()); // converts data from req obj into json format
+app.use(express.json()); 
 
 
 // all routes here
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/job', jobRouter);
 
-
-app.use('*', catchAsync(async (req, res, next) => { // to handle routes that do not appear
-    throw new AppError(`Can't find ${req.originalUrl} on this server`, 404) // next calls the next middleware, if put error, will call global error handler
+// global wildcard handler
+app.use('*', catchAsync(async (req, res, next) => { 
+    throw new AppError(`Can't find ${req.originalUrl} on this server`, 404) 
     // res.status(404).json({
     //     status: 'fail',
     //     message: 'Route is not found'

@@ -12,40 +12,31 @@ exports.createPdf = async (data, pdfNames) => {
     const pdfPromises = data.map(async (item, index) => {
         const pdfName = pdfNames[index];
 
-        // Create a new PDF document
         const doc = new pdfkit();
 
-        // Ensure the directory exists
         const folderPath = path.join(__dirname, 'temp_pdf');
         if (!fs.existsSync(folderPath)) {
             fs.mkdirSync(folderPath);
         }
 
-        // Set the full path for the PDF file
         const fullPath = path.join(folderPath, `${pdfName}.pdf`);
 
-        // Pipe the PDF content to a file
         const stream = fs.createWriteStream(fullPath);
         doc.pipe(stream);
 
-        // Set the font size
         doc.fontSize(12);
 
-        // Print the id
         doc.text(`Transaction ID: ${item.id}`, { width: 410, align: 'left' });
-        doc.moveDown(); // Move down for the next line
+        doc.moveDown(); 
 
-        // Iterate through the result object and display each key-value pair
         const result = item.result;
         Object.keys(result).forEach((key) => {
             doc.text(`${key}: ${result[key]}`, { width: 410, align: 'left' });
-            doc.moveDown(); // Move down for the next line
+            doc.moveDown(); 
         });
 
-        // Finalize the PDF
         doc.end();
 
-        // Return a promise to handle asynchronous operations
         return new Promise((resolve, reject) => {
             stream.on('finish', () => {
                 resolve(`PDF ${pdfName} created successfully`);
