@@ -1,8 +1,7 @@
-// src/components/CompanyDashboard.js
-
 import React, { useState, useEffect } from 'react';
 import { Table, Thead, Tbody, Tr, Th, Td, Checkbox, Button, Box, Flex, Spacer } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/navbar';
 import { getAllJobsOfCompany } from '../api/job/getAllJobs';
 import { markJobDone } from '../api/job/markJobDone';
 
@@ -50,6 +49,8 @@ const CompanyDashboard = () => {
   };
 
   return (
+    <>
+     <Navbar />
     <Box p={4}>
       <Flex mb={4}>
         <Spacer />
@@ -94,6 +95,7 @@ const CompanyDashboard = () => {
         Submit
       </Button>
     </Box>
+    </>
   );
 };
 
