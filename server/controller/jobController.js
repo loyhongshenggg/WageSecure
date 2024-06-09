@@ -5,6 +5,7 @@ const user = require('../db/models/user');
 const { getWalletAddressFromSeed, sendXRP, getWalletBalance, sendXRPGroup } = require("../utils/wallet");
 const { daysBetweenDates } = require("../utils/date");
 const { createPdf, sendPdf } = require("../utils/email");
+require("dotenv").config();
 
 
 // 1. Checks if employer has enough XRP to deploy job
@@ -23,7 +24,7 @@ const createJob = catchAsync(async (req, res, next) => {
 
   // handles XRP transfer from company to admin wallet
   const companyWalletSeed = employer.walletSeed;
-  const adminWalletSeed = "sEdVjHZN4oQ1LTJSxCjTGbpq4Puu3Z3";
+  const adminWalletSeed = process.env.ADMIN_SEED;
 
   if ((await getWalletBalance(employer.walletSeed)) < totalXRP) {
     return next(new AppError('Employer does not have enough XRP', 500));
@@ -79,7 +80,7 @@ const markJobAsComplete = catchAsync(async (req, res, next) => {
   }
 
   // Handles XRP transfer from company to admin wallet
-  const adminWalletSeed = "sEdVjHZN4oQ1LTJSxCjTGbpq4Puu3Z3";
+  const adminWalletSeed = process.env.ADMIN_SEED;
 
   // Fetch the users by their IDs
   const employeesToPay = await user.findAll({

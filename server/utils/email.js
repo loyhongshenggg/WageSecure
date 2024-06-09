@@ -4,9 +4,8 @@ const pdfkit = require('pdfkit');
 const path = require('path')
 const nodemailer = require('nodemailer')
 const fs = require('fs')
-const env = require('dotenv')
 const User = require('../db/models/user');
-env.config()
+require("dotenv").config();
 
 
 exports.createPdf = async (data, pdfNames) => {
@@ -67,11 +66,11 @@ exports.createPdf = async (data, pdfNames) => {
 
 
 exports.sendPdf = async (fileNames) => {
-    // Iterate over the file names (user IDs)
+
     for (const fileName of fileNames) {
         try {
-            // Query for the email corresponding to the user ID using Sequelize
-            const user = await User.findOne({ where: { id: fileName } }); // Modify this query based on your Sequelize model
+
+            const user = await User.findOne({ where: { id: fileName } });
 
             if (user && user.email) {
                 // Read the PDF file as base64
@@ -80,19 +79,19 @@ exports.sendPdf = async (fileNames) => {
 
                 // Create SMTP transport
                 const smtpTransport = nodemailer.createTransport({
-                    host: 'smtp.mailersend.net',
+                    host: process.env.EMAIL_HOST,
                     port: 587,
                     secure: false,
                     auth: {
-                        user: 'MS_b1r6e3@trial-0r83ql3od3xlzw1j.mlsender.net',
-                        pass: 'xQtBbWweIVWmBCnS'
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASSWORD
                     },
                     tls: { rejectUnauthorized: false }
                 });
 
                 // Send email with attached PDF
                 await smtpTransport.sendMail({
-                    from: 'MS_b1r6e3@trial-0r83ql3od3xlzw1j.mlsender.net', // Update with your sender email address
+                    from: process.env.EMAIL_USER,
                     to: user.email,
                     subject: 'Pdf Generate document',
                     html: 'Payslip for month YYYY-MM-DD',

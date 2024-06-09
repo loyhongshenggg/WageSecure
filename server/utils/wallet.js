@@ -1,4 +1,5 @@
 const xrpl = require('xrpl');
+require("dotenv").config();
 
 async function createAdminWallet() {
     
@@ -6,7 +7,7 @@ async function createAdminWallet() {
     console.log("Connecting to Testnet...");
     
     await client.connect();
-    const test_wallet = xrpl.Wallet.fromSeed("sEdVjHZN4oQ1LTJSxCjTGbpq4Puu3Z3");
+    const test_wallet = xrpl.Wallet.fromSeed(process.env.ADMIN_SEED);
 
     client.disconnect();
 
